@@ -17,7 +17,7 @@ pipeline{
    stage('Mavenbuild')
    {
     steps{
-	sh "/bin/mvn -f ${mpath}/pom.xml clean packages"
+	sh "/bin/mvn -f ${mpath}/pom.xml clean package"
 	}
    }
    stage('artifact'){
