@@ -1,0 +1,42 @@
+def mpath = 'spring-boot-samples/spring-boot-sample-atmosphere'
+def bstatus(status,kolor){
+ slackSend channel: 'devops-team', color: "${kolor}", message: "Build ${status}", teamDomain: 'devops-hmy7283'
+ emailext body: "Build ${status}", subject: "Build ${status}", to: 'karisettisivaji@gmail.com'
+}
+pipeline{
+  agent any
+  tools{
+   maven 'Maven-home'
+  }
+    stages{
+   stage('GitCheckout'){
+    steps{
+	  git branch: 'main', url: 'https://github.com/Karisetti/jenkins-job.git'
+	}
+   }
+   stage('Mavenbuild')
+   {
+    steps{
+	sh "/bin/mvn -f ${mpath}/pom.xml clean packages"
+	}
+   }
+   stage('artifact'){
+    steps{
+	archiveArtifacts artifacts: "${mpath}/target/*.?ar", followSymlinks: false
+	}
+   }
+   stage('junit'){
+    steps{
+	  junit "${mpath}/target/surefire-reports/*.xml"
+	}
+   }
+  }
+  post{
+    success{
+	bstatus('Success','#00FF00')
+	}
+	failure{
+	 bstatus('Failed','#FF0000')
+	}
+  }
+ }
